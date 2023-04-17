@@ -45,7 +45,10 @@ function kube::release::package_tarballs() {
   rm -rf "${RELEASE_STAGE}" "${RELEASE_TARS}" "${RELEASE_IMAGES}"
   mkdir -p "${RELEASE_TARS}"
   kube::release::package_src_tarball &
-  kube::release::package_client_tarballs &
+
+  # Ignore client tarballs
+  # kube::release::package_client_tarballs &
+
   kube::release::package_kube_manifests_tarball &
   kube::util::wait-for-jobs || { kube::log::error "previous tarball phase failed"; return 1; }
 
@@ -55,7 +58,7 @@ function kube::release::package_tarballs() {
   kube::util::wait-for-jobs || { kube::log::error "previous tarball phase failed"; return 1; }
 
   kube::release::package_final_tarball & # _final depends on some of the previous phases
-  kube::release::package_test_tarballs & # _test doesn't depend on anything
+  # kube::release::package_test_tarballs & # _test doesn't depend on anything
   kube::util::wait-for-jobs || { kube::log::error "previous tarball phase failed"; return 1; }
 }
 
@@ -222,16 +225,16 @@ function kube::release::package_server_tarballs() {
       "${release_stage}/server/bin/"
 
     # Include the client binaries here too as they are useful debugging tools.
-    local client_bins
-    client_bins=("${KUBE_CLIENT_BINARIES[@]}")
-    if [[ "${platform%/*}" = 'windows' ]]; then
-      client_bins=("${KUBE_CLIENT_BINARIES_WIN[@]}")
-    fi
-    # This fancy expression will expand to prepend a path
-    # (${LOCAL_OUTPUT_BINPATH}/${platform}/) to every item in the
-    # client_bins array.
-    cp "${client_bins[@]/#/${LOCAL_OUTPUT_BINPATH}/${platform}/}" \
-      "${release_stage}/server/bin/"
+#    local client_bins
+#    client_bins=("${KUBE_CLIENT_BINARIES[@]}")
+#    if [[ "${platform%/*}" = 'windows' ]]; then
+#      client_bins=("${KUBE_CLIENT_BINARIES_WIN[@]}")
+#    fi
+#    # This fancy expression will expand to prepend a path
+#    # (${LOCAL_OUTPUT_BINPATH}/${platform}/) to every item in the
+#    # client_bins array.
+#    cp "${client_bins[@]/#/${LOCAL_OUTPUT_BINPATH}/${platform}/}" \
+#      "${release_stage}/server/bin/"
 
     cp -R "${KUBE_ROOT}/LICENSES" "${release_stage}/"
 
@@ -301,7 +304,8 @@ function kube::release::create_docker_images_for_server() {
     # If we use KUBE_DOCKER_REGISTRY="registry.k8s.io", then the extra tag (same) is ignored, see release_docker_image_tag below.
     local -r docker_registry="registry.k8s.io"
     # Docker tags cannot contain '+'
-    local docker_tag="${KUBE_GIT_VERSION/+/_}"
+    # local docker_tag="${KUBE_GIT_VERSION/+/_}"
+    local docker_tag="github_actions"
     if [[ -z "${docker_tag}" ]]; then
       kube::log::error "git version information missing; cannot create Docker tag"
       return 1

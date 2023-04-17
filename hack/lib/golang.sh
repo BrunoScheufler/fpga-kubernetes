@@ -24,34 +24,53 @@ readonly KUBE_GOPATH="${KUBE_OUTPUT}/go"
 readonly KUBE_SUPPORTED_SERVER_PLATFORMS=(
   linux/amd64
   linux/arm64
-  linux/s390x
-  linux/ppc64le
 )
+
+## The server platform we are building on.
+#readonly KUBE_SUPPORTED_SERVER_PLATFORMS=(
+#  linux/amd64
+#  linux/arm64
+#  linux/s390x
+#  linux/ppc64le
+#)
 
 # The node platforms we build for
 readonly KUBE_SUPPORTED_NODE_PLATFORMS=(
   linux/amd64
   linux/arm64
-  linux/s390x
-  linux/ppc64le
-  windows/amd64
 )
+
+## The node platforms we build for
+#readonly KUBE_SUPPORTED_NODE_PLATFORMS=(
+#  linux/amd64
+#  linux/arm64
+#  linux/s390x
+#  linux/ppc64le
+#  windows/amd64
+#)
 
 # If we update this we should also update the set of platforms whose standard
 # library is precompiled for in build/build-image/cross/Dockerfile
 readonly KUBE_SUPPORTED_CLIENT_PLATFORMS=(
   linux/amd64
-  linux/386
-  linux/arm
   linux/arm64
-  linux/s390x
-  linux/ppc64le
-  darwin/amd64
-  darwin/arm64
-  windows/amd64
-  windows/386
-  windows/arm64
 )
+
+## If we update this we should also update the set of platforms whose standard
+## library is precompiled for in build/build-image/cross/Dockerfile
+#readonly KUBE_SUPPORTED_CLIENT_PLATFORMS=(
+#  linux/amd64
+#  linux/386
+#  linux/arm
+#  linux/arm64
+#  linux/s390x
+#  linux/ppc64le
+#  darwin/amd64
+#  darwin/arm64
+#  windows/amd64
+#  windows/386
+#  windows/arm64
+#)
 
 # Which platforms we should compile test targets for.
 # Not all client platforms need these tests
@@ -69,19 +88,31 @@ readonly KUBE_SUPPORTED_TEST_PLATFORMS=(
 # The set of server targets that we are only building for Linux
 kube::golang::server_targets() {
   local targets=(
+    cmd/kube-scheduler
     cmd/kube-proxy
     cmd/kube-apiserver
-    cmd/kube-controller-manager
     cmd/kubelet
     cmd/kubeadm
-    cmd/kube-scheduler
-    vendor/k8s.io/component-base/logs/kube-log-runner
-    vendor/k8s.io/kube-aggregator
-    vendor/k8s.io/apiextensions-apiserver
-    cluster/gce/gci/mounter
   )
   echo "${targets[@]}"
 }
+
+# The set of server targets that we are only building for Linux
+#kube::golang::server_targets() {
+#  local targets=(
+#    cmd/kube-proxy
+#    cmd/kube-apiserver
+#    cmd/kube-controller-manager
+#    cmd/kubelet
+#    cmd/kubeadm
+#    cmd/kube-scheduler
+#    vendor/k8s.io/component-base/logs/kube-log-runner
+#    vendor/k8s.io/kube-aggregator
+#    vendor/k8s.io/apiextensions-apiserver
+#    cluster/gce/gci/mounter
+#  )
+#  echo "${targets[@]}"
+#}
 
 IFS=" " read -ra KUBE_SERVER_TARGETS <<< "$(kube::golang::server_targets)"
 readonly KUBE_SERVER_TARGETS
@@ -91,14 +122,22 @@ readonly KUBE_SERVER_BINARIES=("${KUBE_SERVER_TARGETS[@]##*/}")
 kube::golang::server_image_targets() {
   # NOTE: this contains cmd targets for kube::build::get_docker_wrapped_binaries
   local targets=(
-    cmd/kube-apiserver
-    cmd/kube-controller-manager
     cmd/kube-scheduler
-    cmd/kube-proxy
-    cmd/kubectl
   )
   echo "${targets[@]}"
 }
+
+#kube::golang::server_image_targets() {
+#  # NOTE: this contains cmd targets for kube::build::get_docker_wrapped_binaries
+#  local targets=(
+#    cmd/kube-apiserver
+#    cmd/kube-controller-manager
+#    cmd/kube-scheduler
+#    cmd/kube-proxy
+#    cmd/kubectl
+#  )
+#  echo "${targets[@]}"
+#}
 
 IFS=" " read -ra KUBE_SERVER_IMAGE_TARGETS <<< "$(kube::golang::server_image_targets)"
 readonly KUBE_SERVER_IMAGE_TARGETS
